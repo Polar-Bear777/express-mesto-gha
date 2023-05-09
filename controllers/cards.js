@@ -1,13 +1,16 @@
 const cardSchema = require('../models/card');
 
+const VALIDATION_ERROR = 400;
+const NOT_FOUND_ERROR = 404;
+const INTERNAL_SERVER_ERROR = 500;
+
 // Получить все карточки из БД
-module.exports.getCards = (req, res) => {
+module.exports.getCards = (req, res, next) => {
   cardSchema
     .find({})
     .then((cards) => res.status(200)
       .send(cards))
-    .catch((err) => res.status(500)
-      .send({ message: err.message }));
+    .catch(next);
 };
 
 // Удалить карточки
@@ -18,7 +21,7 @@ module.exports.deleteCard = (req, res) => {
     .findByIdAndRemove(cardId)
     .then((card) => {
       if (!card) {
-        return res.status(404)
+        return res.status(NOT_FOUND_ERROR)
           .send({ message: 'Not found: Invalid _id' });
       }
 
@@ -27,11 +30,11 @@ module.exports.deleteCard = (req, res) => {
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(400)
+        res.status(VALIDATION_ERROR)
           .send({ message: 'Card with _id cannot be found' });
       } else {
         res.status(500)
-          .send({ message: err.message });
+          .send({ message: 'На сервере произошла ошибка' });
       }
     });
 };
@@ -54,11 +57,11 @@ module.exports.createCard = (req, res) => {
       .send(card))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(400)
+        res.status(VALIDATION_ERROR)
           .send({ message: 'Invalid data for card creation' });
       } else {
         res.status(500)
-          .send({ message: err.message });
+          .send({ message: 'На сервере произошла ошибка' });
       }
     });
 };
@@ -73,7 +76,7 @@ module.exports.addLike = (req, res) => {
     )
     .then((card) => {
       if (!card) {
-        return res.status(404)
+        return res.status(NOT_FOUND_ERROR)
           .send({ message: 'Not found: Invalid _id' });
       }
 
@@ -82,12 +85,12 @@ module.exports.addLike = (req, res) => {
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        return res.status(400)
+        return res.status(VALIDATION_ERROR)
           .send({ message: 'Invalid data to add like' });
       }
 
-      return res.status(500)
-        .send({ message: err.message });
+      return res.status(INTERNAL_SERVER_ERROR)
+        .send({ message: 'На сервере произошла ошибка' });
     });
 };
 
@@ -101,7 +104,7 @@ module.exports.deleteLike = (req, res) => {
     )
     .then((card) => {
       if (!card) {
-        return res.status(404)
+        return res.status(NOT_FOUND_ERROR)
           .send({ message: 'Not found: Invalid _id' });
       }
 
@@ -109,12 +112,12 @@ module.exports.deleteLike = (req, res) => {
         .send(card);
     })
     .catch((err) => {
-      if (err.name === 'CastError' || err.name === 'ValidationError') {
-        return res.status(400)
+      if (err.name === 'CastError') {
+        return res.status(VALIDATION_ERROR)
           .send({ message: 'Invalid data to delete like' });
       }
 
-      return res.status(500)
-        .send({ message: err.message });
+      return res.status(INTERNAL_SERVER_ERROR)
+        .send({ message: 'На сервере произошла ошибка' });
     });
 };

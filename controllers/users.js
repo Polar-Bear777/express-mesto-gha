@@ -1,12 +1,15 @@
 const userSchema = require('../models/user');
 
+const VALIDATION_ERROR = 400;
+const NOT_FOUND_ERROR = 404;
+const INTERNAL_SERVER_ERROR = 500;
+
 // Получить всех юзеров из БД
-module.exports.getUsers = (req, res) => {
+module.exports.getUsers = (req, res, next) => {
   userSchema
     .find({})
     .then((users) => res.send(users))
-    .catch((err) => res.status(500)
-      .send({ message: err.message }));
+    .catch(next);
 };
 
 // Найти юзера по ID
@@ -19,17 +22,17 @@ module.exports.getUserById = (req, res) => {
     .then((user) => res.send(user))
     .catch((err) => {
       if (err.name === 'CastError') {
-        return res.status(400)
+        return res.status(VALIDATION_ERROR)
           .send({ message: 'Bad Request' });
       }
 
       if (err.name === 'DocumentNotFoundError') {
-        return res.status(404)
+        return res.status(NOT_FOUND_ERROR)
           .send({ message: 'User with _id cannot be found' });
       }
 
-      return res.status(500)
-        .send({ message: err.message });
+      return res.status(INTERNAL_SERVER_ERROR)
+        .send({ message: 'На сервере произошла ошибка' });
     });
 };
 
@@ -51,11 +54,11 @@ module.exports.createUser = (req, res) => {
       .send(user))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(400)
+        res.status(VALIDATION_ERROR)
           .send({ message: 'Invalid data to create user' });
       } else {
-        res.status(500)
-          .send({ message: err.message });
+        res.status(INTERNAL_SERVER_ERROR)
+          .send({ message: 'На сервере произошла ошибка' });
       }
     });
 };
@@ -70,11 +73,11 @@ module.exports.updateProfile = (req, res) => {
     .then((user) => res.status(200).send(user))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(400)
+        res.status(VALIDATION_ERROR)
           .send({ message: 'Invalid data to create user' });
       } else {
-        res.status(500)
-          .send({ message: err.message });
+        res.status(INTERNAL_SERVER_ERROR)
+          .send({ message: 'На сервере произошла ошибка' });
       }
     });
 };
@@ -89,11 +92,11 @@ module.exports.updateAvatar = (req, res) => {
     .then((user) => res.status(200).send(user))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(400)
+        res.status(VALIDATION_ERROR)
           .send({ message: 'Invalid data to create user' });
       } else {
-        res.status(500)
-          .send({ message: err.message });
+        res.status(INTERNAL_SERVER_ERROR)
+          .send({ message: 'На сервере произошла ошибка' });
       }
     });
 };
