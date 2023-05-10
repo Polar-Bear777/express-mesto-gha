@@ -4,6 +4,8 @@ const VALIDATION_ERROR = 400;
 const NOT_FOUND_ERROR = 404;
 const INTERNAL_SERVER_ERROR = 500;
 
+const serverErrorMessage = 'На сервере произошла ошибка';
+
 // Получить все карточки из БД
 module.exports.getCards = (req, res, next) => {
   cardSchema
@@ -34,7 +36,7 @@ module.exports.deleteCard = (req, res) => {
           .send({ message: 'Card with _id cannot be found' });
       } else {
         res.status(500)
-          .send({ message: 'На сервере произошла ошибка' });
+          .send(serverErrorMessage);
       }
     });
 };
@@ -61,7 +63,7 @@ module.exports.createCard = (req, res) => {
           .send({ message: 'Invalid data for card creation' });
       } else {
         res.status(500)
-          .send({ message: 'На сервере произошла ошибка' });
+          .send(serverErrorMessage);
       }
     });
 };
@@ -90,7 +92,7 @@ module.exports.addLike = (req, res) => {
       }
 
       return res.status(INTERNAL_SERVER_ERROR)
-        .send({ message: 'На сервере произошла ошибка' });
+        .send(serverErrorMessage);
     });
 };
 
@@ -118,6 +120,6 @@ module.exports.deleteLike = (req, res) => {
       }
 
       return res.status(INTERNAL_SERVER_ERROR)
-        .send({ message: 'На сервере произошла ошибка' });
+        .send(serverErrorMessage);
     });
 };

@@ -4,6 +4,8 @@ const VALIDATION_ERROR = 400;
 const NOT_FOUND_ERROR = 404;
 const INTERNAL_SERVER_ERROR = 500;
 
+const serverErrorMessage = 'На сервере произошла ошибка';
+
 // Получить всех юзеров из БД
 module.exports.getUsers = (req, res, next) => {
   userSchema
@@ -32,7 +34,7 @@ module.exports.getUserById = (req, res) => {
       }
 
       return res.status(INTERNAL_SERVER_ERROR)
-        .send({ message: 'На сервере произошла ошибка' });
+        .send(serverErrorMessage);
     });
 };
 
@@ -58,7 +60,7 @@ module.exports.createUser = (req, res) => {
           .send({ message: 'Invalid data to create user' });
       } else {
         res.status(INTERNAL_SERVER_ERROR)
-          .send({ message: 'На сервере произошла ошибка' });
+          .send(serverErrorMessage);
       }
     });
 };
@@ -77,7 +79,7 @@ module.exports.updateProfile = (req, res) => {
           .send({ message: 'Invalid data to create user' });
       } else {
         res.status(INTERNAL_SERVER_ERROR)
-          .send({ message: 'На сервере произошла ошибка' });
+          .send(serverErrorMessage);
       }
     });
 };
@@ -96,7 +98,7 @@ module.exports.updateAvatar = (req, res) => {
           .send({ message: 'Invalid data to create user' });
       } else {
         res.status(INTERNAL_SERVER_ERROR)
-          .send({ message: 'На сервере произошла ошибка' });
+          .send(serverErrorMessage);
       }
     });
 };
