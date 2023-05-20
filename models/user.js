@@ -6,7 +6,6 @@ const UnauthorizedError = require('../errors/UnauthorizedError');
 const userSchema = new mongoose.Schema({
   name: {
     type: String,
-    required: true,
     minlength: 2,
     maxlength: 30,
     default: 'Жак-Ив Кусто',
@@ -15,12 +14,10 @@ const userSchema = new mongoose.Schema({
     type: String,
     minlength: 2,
     maxlength: 30,
-    required: true,
     default: 'Исследователь',
   },
   avatar: {
     type: String,
-    required: true,
     validate: {
       validator: (url) => validator.isURL(url),
       message: 'Incorrect URL',
@@ -43,7 +40,8 @@ const userSchema = new mongoose.Schema({
   },
 });
 
-userSchema.statics.findUserByCredentials = function _(email, password) {
+// В случае аутентификации вернем хэш пароля
+userSchema.statics.findUserByCredentials = function (email, password) {
   return this.findOne({ email })
     .select('+password')
     .then((user) => {

@@ -32,10 +32,7 @@ module.exports.deleteCard = (req, res, next) => {
 
 // Создать карточку
 module.exports.createCard = (req, res, next) => {
-  const {
-    name,
-    link,
-  } = req.body;
+  const { name, link } = req.body;
   const owner = req.user._id;
 
   cardSchema

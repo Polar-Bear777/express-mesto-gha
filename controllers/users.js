@@ -19,7 +19,6 @@ module.exports.getUserById = (req, res, next) => {
 
   userSchema
     .findById(userId)
-    .orFail()
     .then((user) => {
       if (!user) {
         throw new NotFoundError('User cannot be found');
@@ -118,10 +117,7 @@ module.exports.updateAvatar = (req, res, next) => {
 
 // Получить почту/пароль
 module.exports.login = (req, res, next) => {
-  const {
-    email,
-    password,
-  } = req.body;
+  const { email, password } = req.body;
 
   return userSchema
     .findUserByCredentials(email, password)

@@ -1,10 +1,10 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const { errors } = require('celebrate');
-const router = require('./routes/index');
 const { createUserValidation, loginValidation } = require('./middlewares/validation');
-const auth = require('./middlewares/auth');
 const { createUser, login } = require('./controllers/users');
+const router = require('./routes/index');
+const auth = require('./middlewares/auth');
 
 const {
   MONGO_URL = 'mongodb://127.0.0.1:27017/mestodb',
