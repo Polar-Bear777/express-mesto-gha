@@ -15,11 +15,11 @@ const app = express();
 
 app.use(express.json());
 
-// роуты, не требующие авторизации,
-// например, регистрация и логин
+// роуты, не требующие авторизации - регистрация и логин
 app.post('/signin', loginValidation, login);
 app.post('/signup', createUserValidation, createUser);
 
+// авторизация
 app.use(auth);
 app.use(router);
 
