@@ -44,13 +44,14 @@ module.exports.createUser = (req, res, next) => {
   } = req.body;
   bcrypt.hash(password, 10)
     .then((hash) => {
-      userSchema.create({
-        name,
-        about,
-        avatar,
-        email,
-        password: hash,
-      })
+      userSchema
+        .create({
+          name,
+          about,
+          avatar,
+          email,
+          password: hash,
+        })
         .then(() => res.status(201)
           .send(
             {

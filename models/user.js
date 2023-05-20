@@ -16,6 +16,11 @@ const userSchema = new mongoose.Schema({
     maxlength: 30,
     default: 'Исследователь',
   },
+  password: {
+    type: String,
+    required: true,
+    select: false,
+  },
   avatar: {
     type: String,
     validate: {
@@ -23,11 +28,6 @@ const userSchema = new mongoose.Schema({
       message: 'Incorrect URL',
     },
     default: 'https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png',
-  },
-  password: {
-    type: String,
-    required: true,
-    select: false,
   },
   email: {
     unique: true,
@@ -41,7 +41,7 @@ const userSchema = new mongoose.Schema({
 });
 
 // В случае аутентификации вернем хэш пароля
-userSchema.statics.findUserByCredentials = function (email, password) {
+userSchema.statics.findUserByCredentials = function _(email, password) {
   return this.findOne({ email })
     .select('+password')
     .then((user) => {

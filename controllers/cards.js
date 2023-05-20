@@ -41,8 +41,7 @@ module.exports.createCard = (req, res, next) => {
       link,
       owner,
     })
-    .then((card) => res.status(201)
-      .send(card))
+    .then((card) => res.status(201).send(card))
     .catch((err) => {
       if (err.name === 'ValidationError') {
         next(new BadRequestError('Invalid data for card creation'));
