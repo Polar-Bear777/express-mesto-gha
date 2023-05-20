@@ -2,9 +2,9 @@ const express = require('express');
 const mongoose = require('mongoose');
 const { errors } = require('celebrate');
 const router = require('./routes/index');
-const { createUser, login } = require('./controllers/users');
 const { createUserValidation, loginValidation } = require('./middlewares/validation');
 const auth = require('./middlewares/auth');
+const { createUser, login } = require('./controllers/users');
 
 const {
   MONGO_URL = 'mongodb://127.0.0.1:27017/mestodb',
@@ -25,6 +25,17 @@ app.use(router);
 
 // Централизованная обработка ошибок
 app.use(errors()); // JOI
+
+app.use((error, req, res, next) => {
+  const { status = 500, message } = error;
+  res.status(status)
+    .send({
+      message: status === 500
+        ? 'На сервере произошла ошибка'
+        : message,
+    });
+  next();
+});
 
 // Подключение к MongoDB
 async function start() {
