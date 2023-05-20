@@ -1,6 +1,10 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const { errors } = require('celebrate');
 const router = require('./routes/index');
+const { createUser, login } = require('./controllers/users');
+const { createUserValidation, loginValidation } = require('./middlewares/validation');
+const auth = require('./middlewares/auth');
 
 const {
   MONGO_URL = 'mongodb://127.0.0.1:27017/mestodb',
@@ -10,23 +14,27 @@ const {
 const app = express();
 
 app.use(express.json());
-app.use((req, res, next) => {
-  req.user = {
-    _id: '645a24d6b30213e1cb88f956',
-  };
 
-  next();
-});
+// роуты, не требующие авторизации,
+// например, регистрация и логин
+app.post('/signin', loginValidation, login);
+app.post('/signup', createUserValidation, createUser);
+
+app.use(auth);
 app.use(router);
 
+// Централизованная обработка ошибок
+app.use(errors()); // JOI
+
+// Подключение к MongoDB
 async function start() {
   try {
     await mongoose.connect(MONGO_URL);
     await app.listen(PORT);
-    await console.log(`App listening on port ${PORT}`);
   } catch (err) {
     console.log(err);
   }
 }
 
-start();
+start()
+  .then(() => console.log(`App has been successfully started!\n${MONGO_URL}\nPort: ${PORT}`));

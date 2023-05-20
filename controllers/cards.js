@@ -1,10 +1,7 @@
 const cardSchema = require('../models/card');
-
-const VALIDATION_ERROR = 400;
-const NOT_FOUND_ERROR = 404;
-const INTERNAL_SERVER_ERROR = 500;
-
-const serverErrorMessage = 'На сервере произошла ошибка';
+const NotFoundError = require('../errors/NotFoundError');
+const BadRequestError = require('../errors/BadRequestError');
+const ForbiddenError = require('../errors/ForbiddenError');
 
 // Получить все карточки из БД
 module.exports.getCards = (req, res, next) => {
@@ -16,33 +13,25 @@ module.exports.getCards = (req, res, next) => {
 };
 
 // Удалить карточки
-module.exports.deleteCard = (req, res) => {
+module.exports.deleteCard = (req, res, next) => {
   const { cardId } = req.params;
 
   cardSchema
     .findByIdAndRemove(cardId)
     .then((card) => {
       if (!card) {
-        return res.status(NOT_FOUND_ERROR)
-          .send({ message: 'Not found: Invalid _id' });
+        throw new NotFoundError('User cannot be found');
       }
-
-      return res.status(200)
-        .send(card);
+      if (!card.owner.equals(req.user._id)) {
+        return next(new ForbiddenError('Card cannot be deleted'));
+      }
+      return card.deleteOne().then(() => res.send({ message: 'Card was deleted' }));
     })
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        res.status(VALIDATION_ERROR)
-          .send({ message: 'Card with _id cannot be found' });
-      } else {
-        res.status(500)
-          .send(serverErrorMessage);
-      }
-    });
+    .catch(next);
 };
 
 // Создать карточку
-module.exports.createCard = (req, res) => {
+module.exports.createCard = (req, res, next) => {
   const {
     name,
     link,
@@ -59,17 +48,15 @@ module.exports.createCard = (req, res) => {
       .send(card))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(VALIDATION_ERROR)
-          .send({ message: 'Invalid data for card creation' });
+        next(new BadRequestError('Invalid data for card creation'));
       } else {
-        res.status(500)
-          .send(serverErrorMessage);
+        next(err);
       }
     });
 };
 
 // Поставить лайк
-module.exports.addLike = (req, res) => {
+module.exports.addLike = (req, res, next) => {
   cardSchema
     .findByIdAndUpdate(
       req.params.cardId,
@@ -78,26 +65,20 @@ module.exports.addLike = (req, res) => {
     )
     .then((card) => {
       if (!card) {
-        return res.status(NOT_FOUND_ERROR)
-          .send({ message: 'Not found: Invalid _id' });
+        throw new NotFoundError('User cannot be found');
       }
-
-      return res.status(200)
-        .send(card);
+      res.send({ data: card });
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        return res.status(VALIDATION_ERROR)
-          .send({ message: 'Invalid data to add like' });
+        return next(new BadRequestError('Incorrect data'));
       }
-
-      return res.status(INTERNAL_SERVER_ERROR)
-        .send(serverErrorMessage);
+      return next(err);
     });
 };
 
 // Удалить лайк
-module.exports.deleteLike = (req, res) => {
+module.exports.deleteLike = (req, res, next) => {
   cardSchema
     .findByIdAndUpdate(
       req.params.cardId,
@@ -106,20 +87,14 @@ module.exports.deleteLike = (req, res) => {
     )
     .then((card) => {
       if (!card) {
-        return res.status(NOT_FOUND_ERROR)
-          .send({ message: 'Not found: Invalid _id' });
+        throw new NotFoundError('User cannot be found');
       }
-
-      return res.status(200)
-        .send(card);
+      res.send({ data: card });
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        return res.status(VALIDATION_ERROR)
-          .send({ message: 'Invalid data to delete like' });
+        return next(new BadRequestError('Incorrect data'));
       }
-
-      return res.status(INTERNAL_SERVER_ERROR)
-        .send(serverErrorMessage);
+      return next(err);
     });
 };
