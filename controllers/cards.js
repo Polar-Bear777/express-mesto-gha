@@ -7,8 +7,7 @@ const ForbiddenError = require('../errors/ForbiddenError');
 module.exports.getCards = (req, res, next) => {
   cardSchema
     .find({})
-    .then((cards) => res.status(200)
-      .send(cards))
+    .then((cards) => res.send(cards))
     .catch(next);
 };
 
@@ -17,7 +16,7 @@ module.exports.deleteCard = (req, res, next) => {
   const { cardId } = req.params;
 
   cardSchema
-    .findByIdAndRemove(cardId)
+    .findById(cardId)
     .then((card) => {
       if (!card) {
         throw new NotFoundError('User cannot be found');

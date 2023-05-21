@@ -87,8 +87,7 @@ module.exports.updateProfile = (req, res, next) => {
       if (!user) {
         throw new NotFoundError('User cannot be found');
       }
-      res.status(200)
-        .send(user);
+      res.send(user);
     })
     .catch((err) => {
       if (err.name === 'ValidationError' || err.name === 'CastError') {
@@ -146,7 +145,6 @@ module.exports.getUser = (req, res, next) => {
     .catch((err) => {
       if (err.name === 'CastError') {
         next(BadRequestError('Incorrect data'));
-      } else if (err.message === 'NotFound') {
         next(new NotFoundError('User cannot be found'));
       } else {
         next(err);
